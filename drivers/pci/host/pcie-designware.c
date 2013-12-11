@@ -35,7 +35,7 @@ static inline struct pcie_port *sys_to_pcie(struct pci_sys_data *sys)
 	return sys->private_data;
 }
 
-int cfg_read(void __iomem *addr, int where, int size, u32 *val)
+int dw_pcie_cfg_read(void __iomem *addr, int where, int size, u32 *val)
 {
 	*val = readl(addr);
 
@@ -49,7 +49,7 @@ int cfg_read(void __iomem *addr, int where, int size, u32 *val)
 	return PCIBIOS_SUCCESSFUL;
 }
 
-int cfg_write(void __iomem *addr, int where, int size, u32 val)
+int dw_pcie_cfg_write(void __iomem *addr, int where, int size, u32 val)
 {
 	if (size == 4)
 		writel(val, addr);
@@ -87,7 +87,8 @@ static int dw_pcie_rd_own_conf(struct pcie_port *pp, int where, int size,
 	if (pp->ops->rd_own_conf)
 		ret = pp->ops->rd_own_conf(pp, where, size, val);
 	else
-		ret = cfg_read(pp->dbi_base + (where & ~0x3), where, size, val);
+		ret = dw_pcie_cfg_read(pp->dbi_base + (where & ~0x3), where,
+				size, val);
 
 	return ret;
 }
@@ -100,8 +101,8 @@ static int dw_pcie_wr_own_conf(struct pcie_port *pp, int where, int size,
 	if (pp->ops->wr_own_conf)
 		ret = pp->ops->wr_own_conf(pp, where, size, val);
 	else
-		ret = cfg_write(pp->dbi_base + (where & ~0x3), where, size,
-				val);
+		ret = dw_pcie_cfg_write(pp->dbi_base + (where & ~0x3), where,
+				size, val);
 
 	return ret;
 }
@@ -569,10 +570,12 @@ static int dw_pcie_rd_other_conf(struct pcie_port *pp, struct pci_bus *bus,
 
 	if (bus->parent->number == pp->root_bus_nr) {
 		dw_pcie_prog_viewport_cfg0(pp, busdev);
-		ret = cfg_read(pp->va_cfg0_base + address, where, size, val);
+		ret = dw_pcie_cfg_read(pp->va_cfg0_base + address, where, size,
+				val);
 	} else {
 		dw_pcie_prog_viewport_cfg1(pp, busdev);
-		ret = cfg_read(pp->va_cfg1_base + address, where, size, val);
+		ret = dw_pcie_cfg_read(pp->va_cfg1_base + address, where, size,
+				val);
 	}
 
 	return ret;
@@ -590,10 +593,12 @@ static int dw_pcie_wr_other_conf(struct pcie_port *pp, struct pci_bus *bus,
 
 	if (bus->parent->number == pp->root_bus_nr) {
 		dw_pcie_prog_viewport_cfg0(pp, busdev);
-		ret = cfg_write(pp->va_cfg0_base + address, where, size, val);
+		ret = dw_pcie_cfg_write(pp->va_cfg0_base + address, where, size,
+				val);
 	} else {
 		dw_pcie_prog_viewport_cfg1(pp, busdev);
-		ret = cfg_write(pp->va_cfg1_base + address, where, size, val);
+		ret = dw_pcie_cfg_write(pp->va_cfg1_base + address, where, size,
+				val);
 	}
 
 	return ret;
