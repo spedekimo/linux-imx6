@@ -30,6 +30,8 @@ static unsigned long global_io_offset;
 
 static inline struct pcie_port *sys_to_pcie(struct pci_sys_data *sys)
 {
+	BUG_ON(!sys->private_data);
+
 	return sys->private_data;
 }
 
@@ -244,11 +246,6 @@ static int assign_irq(int no_irqs, struct msi_desc *desc, int *pos)
 	int irq, pos0, pos1, i;
 	struct pcie_port *pp = sys_to_pcie(desc->dev->bus->sysdata);
 
-	if (!pp) {
-		BUG();
-		return -EINVAL;
-	}
-
 	pos0 = find_first_zero_bit(pp->msi_irq_in_use,
 			MAX_MSI_IRQS);
 	if (pos0 % no_irqs) {
@@ -309,10 +306,6 @@ static void clear_irq(unsigned int irq)
 	/* get the port structure */
 	msi = irq_data_get_msi(data);
 	pp = sys_to_pcie(msi->dev->bus->sysdata);
-	if (!pp) {
-		BUG();
-		return;
-	}
 
 	/* undo what was done in assign_irq */
 	pos = data->hwirq;
@@ -332,11 +325,6 @@ static int dw_msi_setup_irq(struct msi_chip *chip, struct pci_dev *pdev,
 	u16 msg_ctr;
 	struct msi_msg msg;
 	struct pcie_port *pp = sys_to_pcie(pdev->bus->sysdata);
-
-	if (!pp) {
-		BUG();
-		return -EINVAL;
-	}
 
 	pci_read_config_word(pdev, desc->msi_attrib.pos+PCI_MSI_FLAGS,
 				&msg_ctr);
@@ -640,11 +628,6 @@ static int dw_pcie_rd_conf(struct pci_bus *bus, u32 devfn, int where,
 	struct pcie_port *pp = sys_to_pcie(bus->sysdata);
 	int ret;
 
-	if (!pp) {
-		BUG();
-		return -EINVAL;
-	}
-
 	if (dw_pcie_valid_config(pp, bus, PCI_SLOT(devfn)) == 0) {
 		*val = 0xffffffff;
 		return PCIBIOS_DEVICE_NOT_FOUND;
@@ -668,11 +651,6 @@ static int dw_pcie_wr_conf(struct pci_bus *bus, u32 devfn,
 {
 	struct pcie_port *pp = sys_to_pcie(bus->sysdata);
 	int ret;
-
-	if (!pp) {
-		BUG();
-		return -EINVAL;
-	}
 
 	if (dw_pcie_valid_config(pp, bus, PCI_SLOT(devfn)) == 0)
 		return PCIBIOS_DEVICE_NOT_FOUND;
@@ -700,9 +678,6 @@ static int dw_pcie_setup(int nr, struct pci_sys_data *sys)
 	struct pcie_port *pp;
 
 	pp = sys_to_pcie(sys);
-
-	if (!pp)
-		return 0;
 
 	if (global_io_offset < SZ_1M && pp->config.io_size > 0) {
 		sys->io_offset = global_io_offset - pp->config.io_bus_addr;
