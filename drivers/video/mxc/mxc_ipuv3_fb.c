@@ -3055,6 +3055,9 @@ static int mxcfb_register(struct fb_info *fbi)
 		strcpy(fbi->fix.id, fg_id);
 	}
 
+	if (0 == fbi->var.bits_per_pixel)
+		fbi->var.bits_per_pixel = mxcfbi->default_bpp;
+
 	mxcfb_check_var(&fbi->var, fbi);
 
 	mxcfb_set_fix(fbi);
