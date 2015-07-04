@@ -50,19 +50,19 @@ struct dp_csc_param_t {
 #define DC_DISP_ID_ASYNC	3
 
 /* DC microcode address */
-#define DC_MCODE_DI1_I			1
-#define DC_MCODE_DI1_NL			2
-#define DC_MCODE_DI1_EOL		3
-#define DC_MCODE_DI1_NEW_DATA		1
-#define DC_MCODE_DI1_EVEN_UGDE		8
-#define DC_MCODE_DI1_ODD_UGDE		9
-
 #define DC_MCODE_DI0_I			0
-#define DC_MCODE_DI0_NL			5
-#define DC_MCODE_DI0_EOL		6
-#define DC_MCODE_DI0_NEW_DATA		12
-#define DC_MCODE_DI0_EVEN_UGDE		10
-#define DC_MCODE_DI0_ODD_UGDE		11
+#define DC_MCODE_DI0_NL			1
+#define DC_MCODE_DI0_EOL		2
+#define DC_MCODE_DI0_NEW_DATA		3
+#define DC_MCODE_DI0_EVEN_UGDE		4
+#define DC_MCODE_DI0_ODD_UGDE		5
+
+#define DC_MCODE_DI1_I			6
+#define DC_MCODE_DI1_NL			7
+#define DC_MCODE_DI1_EOL		8
+#define DC_MCODE_DI1_NEW_DATA		9
+#define DC_MCODE_DI1_EVEN_UGDE		10
+#define DC_MCODE_DI1_ODD_UGDE		11
 
 #define DC_MCODE_ASYNC_NEW_DATA		0x64
 
